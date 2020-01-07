@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
+const uuidv4 = require("uuid/v4");
 const app = express();
 
 const COMMENTS_FILE = path.join(__dirname, "comments.json");
@@ -37,19 +38,15 @@ app.get("/api/comments", function(req, res) {
 });
 
 app.post("/api/comments", function(req, res) {
-	console.log(req.body);
 	fs.readFile(COMMENTS_FILE, function(err, data) {
 		if (err) {
 			console.error(err);
 			process.exit(1);
 		}
 		const comments = JSON.parse(data);
-		// NOTE: In a real implementation, we would likely rely on a database or
-		// some other approach (e.g. UUIDs) to ensure a globally unique id. We'll
-		// treat Date.now() as unique-enough for our purposes.
-
 		const newComment = {
-			id: Date.now().toString(),
+			id: uuidv4(),
+			date: Date.now(),
 			author: req.body.author,
 			text: req.body.text
 		};
